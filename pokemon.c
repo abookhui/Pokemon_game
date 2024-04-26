@@ -301,6 +301,7 @@ void backup(PK* mine) {
     printf("저장되었습니다!\n");
     fclose(fp); free(mine); 
 }
+
 void init_pokemon(PK* pk) { // 파일에 있는 포켓몬을 포켓몬 구조체 배열로 만들어서 보관해놈
     FILE* fp = fopen("pokemon.txt", "r");
     if (fp != NULL) {
@@ -318,6 +319,7 @@ void init_pokemon(PK* pk) { // 파일에 있는 포켓몬을 포켓몬 구조체
         fclose(fp);
     }
 }
+
 void input_member(PK* pk, char* buffer, int member) { // 포켓몬 맴버 변수들에 값 넣어주기
     if(member == 1) pk->num = atoi(buffer);
     else if(member == 2) strcpy(pk->name, buffer);
@@ -351,7 +353,7 @@ void select_first_pokemon(PK* pk) {
 void my_pokemon(PK* pk, int len) {
     printf("포켓몬 도감\n");
     for (int i = 0; i < len; i++) 
-    printf("%2d.  %s(%s) %s %d/%d(HP/현재 HP)  %d(공격력)\n", i + 1, pk[i].name, pk[i].nickname, pk[i].type, pk[i].hp, pk[i].pre_hp, pk[i].st);
+    printf("%2d.  %s(%s) %s %d/%d(HP/현재 HP) %d(공격력)\n", i + 1, pk[i].name, pk[i].nickname, pk[i].type, pk[i].hp, pk[i].pre_hp, pk[i].st);
 }
 int priority(char* type_em, char* type_my) {
     int em = 2, my = 0;
@@ -538,11 +540,11 @@ void wild_turn(PK* mine, PK* enemy, int idx, int more_strong, int my_st,int em_s
         int deadPk[7] = {0,};
         for (int i = 0; i < pk_num; i++) {
             if (mine[i].pre_hp > 0) { 
-                printf("%2d.  %s(%s) %s %d/%d(HP/현재 HP)  %d(공격력)\n", i + 1, mine[i].name, mine[i].nickname, mine[i].type, mine[i].hp ,mine[i].pre_hp, mine[i].st);
+                printf("%2d.  %s(%s) %s %d/%d(HP/현재 HP) %d(공격력)\n", i + 1, mine[i].name, mine[i].nickname, mine[i].type, mine[i].hp ,mine[i].pre_hp, mine[i].st);
                 cnt++;
             }
             else {
-                printf("%2d.  %s(%s) %s %d/%d(HP/현재 HP)  %d(공격력) : 상태이상\n", i + 1, mine[i].name, mine[i].nickname, mine[i].type,mine[i].hp,mine[i].pre_hp, mine[i].st);
+                printf("%2d.  %s(%s) %s %d/%d(HP/현재 HP) %d(공격력) : 상태이상\n", i + 1, mine[i].name, mine[i].nickname, mine[i].type,mine[i].hp,mine[i].pre_hp, mine[i].st);
                 deadPk[i+1]++;
             }
         }
