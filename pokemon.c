@@ -4,6 +4,8 @@
 #include<string.h>
 #include<time.h>
 #include<windows.h>
+#include<limits.h>
+// #define IntMaxSize 2147483647
 
 typedef struct PK {
     char name[20];
@@ -19,6 +21,7 @@ typedef struct wallet {
     int money;
     int monsterball;
     int medicine;
+   
 }wallet;
 
 wallet wt = {10000,5,5}; // 지갑
@@ -51,7 +54,8 @@ void wild_turn(PK* mine, PK* enemy, int idx, int more_strong, int my_st,int em_s
 void enter();
 
 int main() {  
-    srand((unsigned int)time(NULL)); system("chcp 65001"); // gcc 한글 깨짐
+    srand((unsigned int)time(NULL)); 
+    system("chcp 65001"); // gcc 한글 깨짐
     int first_pk, how_many, idx = 1;
     int new_game, repet=0; char input[5];
     PK* mine;
@@ -301,7 +305,6 @@ void backup(PK* mine) {
     printf("저장되었습니다!\n");
     fclose(fp); free(mine); 
 }
-
 void init_pokemon(PK* pk) { // 파일에 있는 포켓몬을 포켓몬 구조체 배열로 만들어서 보관해놈
     FILE* fp = fopen("pokemon.txt", "r");
     if (fp != NULL) {
@@ -319,7 +322,6 @@ void init_pokemon(PK* pk) { // 파일에 있는 포켓몬을 포켓몬 구조체
         fclose(fp);
     }
 }
-
 void input_member(PK* pk, char* buffer, int member) { // 포켓몬 맴버 변수들에 값 넣어주기
     if(member == 1) pk->num = atoi(buffer);
     else if(member == 2) strcpy(pk->name, buffer);
@@ -363,8 +365,9 @@ int priority(char* type_em, char* type_my) {
     return (em > my) ? 1 : ((em == my) ? 0 : -1);
 }
 void store(PK* mine) {
-    int select, num, repet=0;
-    
+    int select, repet=0;
+    unsigned long long num;
+    long long MaxSize = INT_MAX;
     printf("\t========================================\n");
     printf("\t 상점\t\t\t지갑 : %d원\n",wt.money);
 
@@ -380,29 +383,56 @@ void store(PK* mine) {
     if (select == 0) main_game(mine);
     else if (select == 1) {
         printf("포켓몬볼을 몇개 구매할까?(취소 -1)\n >> ");
-        scanf("%d", &num);
-        if (num == -1) { store(mine); }
-        else if(num > 0){
-            if (1000 * num > wt.money) printf("돈이 부족해요.. \n");
-            else {
-                wt.monsterball += num; wt.money -= 1000 * num;
-                printf("성공적으로 구매했다! (잔액 : %d원)\n", wt.money);
-            }
+        scanf("%llo", &num);
+        unsigned long long price = 1000 * num;  
+       //printf("%llo %llo %lld\n",num,price,MaxSize);
+
+        if(price>= MaxSize ){
+            printf("Int 범위 초과\n");
+            store(mine);
         }
-        else if(num < 0){ printf("음수를 입력했습니다. 양수를 입력해야합니다,\n"); store(mine); }
+        else{
+             if (num == -1) { store(mine); }
+            else if(num > 0){
+                
+
+                if(price <= wt.money && price > 0){
+                    printf("%d\n", num * 1000);
+                    wt.monsterball += num; wt.money -= 1000 * num;
+                    printf("성공적으로 구매했다! (잔액 : %d원)\n", wt.money);
+                }
+
+                else if (price > wt.money) printf("돈이 부족해요.. \n");
+                else if(price <= 0 ){
+                    printf("잘못된 입력\n");
+                    store(mine);
+                }
+            }
+            else if(num < 0){ printf("음수를 입력했습니다. 양수를 입력해야합니다,\n"); store(mine); }
+        }
+       
     }
     else if (select == 2) {
+
         printf("회복약을 몇개 구매할까?(취소 -1)\n >> ");
-        scanf("%d", &num);
-        if (num == -1)  store(mine); 
-        else if(num > 0){
-            if (500 * num > wt.money) printf("돈이 부족해요.. \n");
-            else {
-                wt.medicine += num; wt.money -= 500 * num;
-                printf("성공적으로 구매했다! (잔액 : %d원)\n", wt.money);
-            }
+        scanf("%llo", &num);
+        unsigned long long price = 500 * num;
+        if(price >= MaxSize){
+            printf("Int 범위 초과\n");
+            store(mine);
         }
-        else if(num < 0){ printf("음수를 입력했습니다. 양수를 입력해야합니다,\n"); store(mine); }
+        else {
+            if (num == -1)  store(mine); 
+            else if(num > 0){
+                if (price > wt.money) printf("돈이 부족해요.. \n");
+                else {
+                    wt.medicine += num; wt.money -= price;
+                    printf("성공적으로 구매했다! (잔액 : %d원)\n", wt.money);
+                }
+            }
+            else if(num < 0){ printf("음수를 입력했습니다. 양수를 입력해야합니다,\n"); store(mine); }
+        }
+        
     }
     main_game(mine);
 }
